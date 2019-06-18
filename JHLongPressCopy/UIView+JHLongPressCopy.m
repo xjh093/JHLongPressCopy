@@ -35,6 +35,7 @@
 #pragma mark - public
 - (void)jh_addLongPressCopy
 {
+    self.userInteractionEnabled = YES;
     [self addGestureRecognizer:[[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressActioin:)]];
 }
 
