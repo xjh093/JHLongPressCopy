@@ -45,6 +45,7 @@
     if (gesture.state == UIGestureRecognizerStateBegan) {
         UIView *view = gesture.view;
         
+        // 用于点击其他区域，隐藏 UIMenuController
         [view.window addSubview:({
             UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
             button.tag = 1000;
@@ -60,22 +61,41 @@
         UIMenuItem *copyItem = [[UIMenuItem alloc] initWithTitle:@"复制" action:@selector(copyAction:)];
         menuCtrl.menuItems = @[copyItem];
         
-        [menuCtrl setTargetRect:view.frame inView:view.superview];
-        [menuCtrl setMenuVisible:YES animated:YES];
+        // 用于唤起 UIMenuController
+        // 更新 Xcode 11 后，UILabel 不起作用了，唤不起小菜单了
+        UITextView *textView = [[UITextView alloc] init];
+        textView.editable = NO;
+        textView.tag = 20200402;
+        [view.window addSubview:textView];
+        [textView becomeFirstResponder];
+        
+        if (@available(iOS 13.0, *)) {
+            [menuCtrl showMenuFromView:view.superview rect:view.frame];
+        } else {
+            [menuCtrl setTargetRect:view.frame inView:view.superview];
+            [menuCtrl setMenuVisible:YES animated:YES];
+        }
     }
 }
 
 - (void)clickAction:(UIButton *)button
 {
     [button removeFromSuperview];
+    [[button.window viewWithTag:20200402] removeFromSuperview];
     [UIMenuController sharedMenuController].menuItems = nil;
-    [[UIMenuController sharedMenuController] setMenuVisible:NO animated:YES];
+    
+    if (@available(iOS 13.0, *)) {
+        [[UIMenuController sharedMenuController] hideMenu];
+    }else{
+        [[UIMenuController sharedMenuController] setMenuVisible:NO animated:YES];
+    }
 }
 
 - (void)copyAction:(UIMenuController *)menuCtrl
 {
     UIView *view = menuCtrl.targetView;
     [[view.window viewWithTag:1000] removeFromSuperview];
+    [[view.window viewWithTag:20200402] removeFromSuperview];
     
     NSString *text = [view performSelector:@selector(text)];
     if (text) {
