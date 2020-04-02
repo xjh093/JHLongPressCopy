@@ -19,6 +19,9 @@
 
 # Logs
 
+## 2020-04-02
+- 1.fix a bug in Xcode 11.
+
 ## 2019-06-18
 - 1.upload.
 
